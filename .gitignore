@@ -1,0 +1,62 @@
+# ── secrets / local config (NEVER publish) ───────────────────────────────────
+# hosts.yaml carries the Orin LAN IP + SSH password; commit hosts.yaml.example
+# instead and have each machine create its own hosts.yaml.
+hosts.yaml
+.env
+.env.*
+!.env.example
+# saved browser sessions from the manual login handoff (cookies / localStorage)
+state/auth/
+**/state/auth/
+
+# ── runtime state & artifacts ────────────────────────────────────────────────
+# persisted DAG runs + deterministic capture bundles (screenshots, HTML, JSON)
+state/
+**/state/
+.run_logs/
+usage.json
+**/usage.json
+
+# gateway call logs / sqlite
+*.db
+*.sqlite
+*.sqlite3
+
+# ── course material (not redistributable) ────────────────────────────────────
+BrowserAgent.pdf
+assign/
+
+# ── demo video pipeline ──────────────────────────────────────────────────────
+# raw Playwright webm clips are regenerable (scripts/record_demo.py); the final
+# mp4 (demo/*.mp4) IS committed so the repo is self-contained.
+demo/raw/
+
+# ── logs ─────────────────────────────────────────────────────────────────────
+*.log
+nohup.out
+S9SharedCode/logs/
+
+# ── python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── playwright / browser ─────────────────────────────────────────────────────
+ms-playwright/
+
+# ── editor / OS cruft ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# ── local agent tooling ──────────────────────────────────────────────────────
+.claude/

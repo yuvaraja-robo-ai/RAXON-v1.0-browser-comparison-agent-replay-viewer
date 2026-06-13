@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAXON — Browser Comparison Terminal</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🌐</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+  <script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+  <script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
+  <style>
+    :root{
+      --bg:#0c0f17; --panel:#141925; --panel2:#1b2230; --line:#26304a;
+      --txt:#e7ecf5; --dim:#8b97ad; --acc:#5b8cff; --grn:#3ddc97; --red:#ff5d57;
+      --yel:#ffb020;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--txt);
+      font-family:"Chakra Petch",system-ui,sans-serif;font-size:14px}
+    code,pre,.mono{font-family:"JetBrains Mono",monospace}
+    header{display:flex;align-items:center;gap:14px;padding:12px 18px;
+      border-bottom:1px solid var(--line);background:var(--panel)}
+    header h1{font-size:16px;margin:0;letter-spacing:.5px}
+    .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px}
+    .up{background:var(--grn)} .down{background:var(--red)}
+    .muted{color:var(--dim)}
+    .layout{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 49px)}
+    .side{border-right:1px solid var(--line);background:var(--panel);overflow:auto;padding:12px}
+    .main{overflow:auto;padding:18px}
+    .btn{background:var(--acc);color:#fff;border:0;border-radius:7px;
+      padding:8px 14px;cursor:pointer;font-family:inherit;font-weight:600}
+    .btn.ghost{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    input,textarea,select{width:100%;background:var(--panel2);border:1px solid var(--line);
+      color:var(--txt);border-radius:7px;padding:8px;font-family:inherit;margin:4px 0}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+      padding:14px;margin-bottom:16px}
+    .card h3{margin:0 0 10px;font-size:13px;text-transform:uppercase;
+      letter-spacing:1px;color:var(--dim)}
+    .sess{padding:8px;border-radius:7px;cursor:pointer;border:1px solid transparent;margin-bottom:5px}
+    .sess:hover{background:var(--panel2)}
+    .sess.active{background:var(--panel2);border-color:var(--acc)}
+    .tag{font-size:10px;padding:1px 6px;border-radius:5px;text-transform:uppercase}
+    .tag.dag{background:#2a3a6a;color:#bcd0ff} .tag.capture{background:#244a3a;color:#a9f0cf}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+    th{color:var(--dim);font-weight:600;font-size:11px;text-transform:uppercase}
+    #dag{height:300px;background:var(--panel2);border-radius:8px}
+    .shot{max-width:100%;border:1px solid var(--line);border-radius:8px;margin-top:8px;cursor:zoom-in}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill{background:var(--panel2);border:1px solid var(--line);border-radius:20px;
+      padding:3px 11px;font-size:12px}
+    .tabs{display:flex;gap:6px;margin-bottom:12px}
+    .tab{padding:6px 12px;border-radius:7px;cursor:pointer;background:var(--panel);border:1px solid var(--line)}
+    .tab.active{background:var(--acc);border-color:var(--acc);color:#fff}
+    a{color:var(--acc)}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;
+      align-items:center;justify-content:center;z-index:50;cursor:zoom-out}
+    .modal img{max-width:94vw;max-height:94vh;border:1px solid var(--line);border-radius:8px}
+    .spinner{width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--yel);
+      border-radius:50%;display:inline-block;animation:spin .8s linear infinite;vertical-align:-2px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .bar{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;
+      margin:8px 0 4px;border:1px solid var(--line)}
+    .bar .fill{height:100%;background:var(--yel);border-radius:4px;transition:width .4s ease}
+    .bar .fill.indet{width:30%;animation:slide 1.2s ease-in-out infinite alternate}
+    @keyframes slide{from{margin-left:0}to{margin-left:70%}}
+    .progress-card{border-color:var(--yel)}
+    .sess .stage{color:var(--yel);font-size:11px;margin-top:3px;white-space:nowrap;
+      overflow:hidden;text-overflow:ellipsis}
+    .btn.small{padding:4px 10px;font-size:12px}
+    .card.flash{animation:flash 1.2s ease-out}
+    @keyframes flash{from{box-shadow:0 0 0 3px var(--acc);background:#1a2335}to{}}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <!-- bump ?v= when app.jsx changes so open tabs don't serve a stale cache -->
+  <script type="text/babel" src="app.jsx?v=3" data-presets="react"></script>
+</body>
+</html>

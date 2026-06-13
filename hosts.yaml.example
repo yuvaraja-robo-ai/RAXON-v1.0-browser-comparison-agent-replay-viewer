@@ -1,0 +1,23 @@
+# S9 host / model / port wiring — single source of truth, consumed by
+# scripts/hostsenv.py (which run_agent.sh evals).
+#
+# COPY THIS FILE to hosts.yaml and fill in your own LAN values. hosts.yaml is
+# gitignored because it holds the Orin SSH password — never commit it.
+#
+#   RPi5 (app box) = app only: DAG agent (flow.py) + V9 gateway (:8109) that
+#                    FORWARDS chat/embeds to the Orin.
+#   Orin           = LLM inference only (Ollama: chat + embeddings).
+
+# Which role THIS machine plays: "orin" or "rpi5". Override with --role / $S9_ROLE.
+role: rpi5
+
+orin:
+  host: 192.168.x.x               # Orin LAN IP
+  user: youruser                  # SSH login for remote `ollama serve` start
+  pass: "your-ssh-password"       # SSH password — local file only, never commit
+  ollama_port: 11434
+  chat_model: qwen3.5:4b-q4_K_M   # native tool-calling 4B
+  embed_model: nomic-embed-text
+
+rpi5:
+  gateway_port: 8109              # the V9 gateway port
