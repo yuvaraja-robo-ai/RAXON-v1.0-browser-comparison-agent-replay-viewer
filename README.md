@@ -235,7 +235,7 @@ sequenceDiagram
 ```bash
 cp hosts.yaml.example hosts.yaml          # fill in your Orin IP / SSH creds
 
-cd /home/pi/SchoolofAI/S9
+cd /path/to/S9                            # repo root
 ./run_agent.sh check                      # preflight: Orin Ollama + gateway
 
 # Web observation UI (viewer + launch) — http://<host>:8200
@@ -248,7 +248,7 @@ uv run python capture_engine.py \
   --goal "Top 3 most-liked text-generation transformers models" --want 3
 
 # LLM-planned DAG run (needs the Orin online):
-cd /home/pi/SchoolofAI/S9
+cd /path/to/S9                            # repo root
 ./run_agent.sh query "Compare the top 3 most-liked Hugging Face text-generation models that use the transformers library. For each give name, parameter count, likes, and a one-line description."
 ./run_agent.sh replay <session_id>        # a=actions, s=screenshots
 ```
